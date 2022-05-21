@@ -1,0 +1,49 @@
+%次洪模型径流划分
+group = 5;
+fc = 2.8;
+imp = 0.0044;
+kkg = 0.95;
+F = 2607;
+wm = 73.3;
+
+b = 0.12;
+wmm = wm*(1+b)/(1-imp);
+rg = 0;
+rs = 0;
+
+w = zeros(31,1);
+w(1,1) = wm/2;
+%计算R
+R = zeros(31,1);
+PE = ps(:,group)-es(:,group);
+for i = 2:31
+    w = w
+    a = wmm *  (1 - (1-w(i)/wm)^(1/(1+b)));
+    if(a +PE(i)>wmm)
+        R(i) = PE(i) - (wm-w);
+    else
+        R(i) = PE(i)+w-wm+wm*((1-(PE(i)+a)/wmm)^(1+b));
+    end
+    if(PE(i)<0)
+        R(i) = 0;
+    end
+end
+
+RG = zeros(30,1);
+RS = zeros(30,1);
+for i = 1:30
+    if(PE(i) > fc)
+        rg = rg + fc*(R(i)-imp*(PE(i)))/(PE(i));
+        RG(i) = RG(i) + fc*(R(i)-imp*(PE(i)))/(PE(i));
+        rs = rs + (PE(i)-fc)*(R(i)-imp*(PE(i)))/(PE(i));
+        RS(i) =  RS(i) + (PE(i)-fc)*(R(i)-imp*(PE(i)))/(PE(i));
+    else
+        RG(i) = RG(i) + R(i);
+        rg(i) = rg(i) + R(i);
+    end
+end
+for i = 1:30
+    for j = 1:7
+        
+    Q2(i) = rg(1-kkg)*F/(3.6*3) + KKG*Q1(i)
+end
